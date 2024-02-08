@@ -1,20 +1,36 @@
 import javax.swing.*;
-import javax.swing.border.LineBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+class Contact {
+    private final String name;
+    private final String phoneNumber;
+
+    Contact(String name, String phoneNumber) {
+        this.name = name;
+        this.phoneNumber = phoneNumber;
+    }
+
+    public String toString() {
+        return name + " - " + phoneNumber;
+    }
+}
+
 class ContactManagementFrame extends JFrame implements ListSelectionListener, ActionListener {
+    private final DefaultListModel<String> listModel;
+    private final JList<String> contactList;
     JLabel nameLabel, phoneNumberLabel;
     JTextField nameTextField, phoneNumberTextField;
-    JList<String> contactList;
     JButton addButton, deleteButton;
     JPanel mainPanel, inputPanel, buttonPanel;
-    String[] contacts = new String[100];
 
     ContactManagementFrame() {
+        // Create list model object
+        listModel = new DefaultListModel<>();
+
         // Create label objects
         nameLabel = new JLabel("Name:");
         phoneNumberLabel = new JLabel("Phone Number:");
@@ -24,9 +40,7 @@ class ContactManagementFrame extends JFrame implements ListSelectionListener, Ac
         phoneNumberTextField = new JTextField(15);
 
         // Create list object
-        contactList = new JList<>(contacts);
-        contactList.setBorder(new LineBorder(Color.black));
-        contactList.setVisibleRowCount(4);
+        contactList = new JList<>(listModel);
         contactList.addListSelectionListener(this);
 
         // Create buttons objects
@@ -51,7 +65,7 @@ class ContactManagementFrame extends JFrame implements ListSelectionListener, Ac
         // mainPanel
         mainPanel = new JPanel(new BorderLayout());
         mainPanel.add(inputPanel, BorderLayout.NORTH);
-        mainPanel.add(contactList, BorderLayout.CENTER);
+        mainPanel.add(new JScrollPane(contactList), BorderLayout.CENTER);
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
 
 
@@ -66,7 +80,22 @@ class ContactManagementFrame extends JFrame implements ListSelectionListener, Ac
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == addButton) {
+            String name = nameTextField.getText();
+            String phoneNumber = phoneNumberTextField.getText();
 
+            Contact contact = new Contact(name, phoneNumber);
+            listModel.addElement(contact.toString());
+
+            nameTextField.setText("");
+            phoneNumberTextField.setText("");
+        }
+        if (e.getSource() == deleteButton) {
+            int selectedIndex = contactList.getSelectedIndex();
+            if (selectedIndex != -1) {
+                listModel.remove(selectedIndex);
+            }
+        }
     }
 }
 
